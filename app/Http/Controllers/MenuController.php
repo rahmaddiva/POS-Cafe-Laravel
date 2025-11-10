@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MenuModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class MenuController extends Controller
 {
@@ -12,7 +13,8 @@ class MenuController extends Controller
      */
     public function index()
     {
-        //
+        $menus = MenuModel::latest()->paginate(10);
+        return view('menu.index' , compact('menus'));
     }
 
     /**
@@ -20,7 +22,7 @@ class MenuController extends Controller
      */
     public function create()
     {
-        //
+        return view('menu.create');
     }
 
     /**
@@ -28,8 +30,25 @@ class MenuController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nama_menu' => 'required|string|max:255',
+            'kategori' => 'required|in:Makanan,Minuman',
+            'harga' => 'required|numeric',
+            'stok' => 'required|integer|min:0',
+            'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+        ]);
+
+        $data = $request->only(['nama_menu', 'kategori', 'harga', 'stok']);
+
+        if ($request->hasFile('gambar')) {
+            $data['gambar'] = $request->file('gambar')->store('menus' , 'public');
+        }
+
+        MenuModel::create($data);
+
+        return redirect()->route('menu.index')->with('success' , 'Menu berhasil ditambahkan');
     }
+
 
     /**
      * Display the specified resource.
@@ -44,7 +63,7 @@ class MenuController extends Controller
      */
     public function edit(MenuModel $menuModel)
     {
-        //
+        return view('menu.edit' , compact('menu'));
     }
 
     /**
@@ -52,7 +71,28 @@ class MenuController extends Controller
      */
     public function update(Request $request, MenuModel $menuModel)
     {
-        //
+         $request->validate([
+            'nama_menu' => 'required|string|max:255',
+            'kategori' => 'required|in:Makanan,Minuman',
+            'harga' => 'required|numeric',
+            'stok' => 'required|integer|min:0',
+            'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        $data = $request->only(['nama_menu', 'kategori', 'harga', 'stok']);
+
+        if ($request->hasFile('gambar')) {
+            // hapus gambar lama
+            if ($menu->gambar && Storage::disk('public')->exists($menu->gambar)) {
+                Storage::disk('public')->delete($menu->gambar);
+            }
+
+            $data['gambar'] = $request->file('gambar')->store('menus', 'public');
+        }
+
+        $menu->update($data);
+
+        return redirect()->route('menu.index')->with('success', 'Menu berhasil diperbarui!');
     }
 
     /**
@@ -60,6 +100,12 @@ class MenuController extends Controller
      */
     public function destroy(MenuModel $menuModel)
     {
-        //
+     if ($menu->gambar && Storage::disk('public')->exists($menu->gambar)) {
+            Storage::disk('public')->delete($menu->gambar);
+        }
+
+        $menu->delete();
+
+        return redirect()->route('menu.index')->with('success', 'Menu berhasil dihapus!');
     }
 }

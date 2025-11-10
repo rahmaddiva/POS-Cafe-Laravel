@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MenuController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +26,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Khusus admin
     Route::middleware(['role:admin'])->group(function () {
         Route::get('/admin', [DashboardController::class, 'admin'])->name('admin.dashboard');
+         Route::resource('menu', MenuController::class);
     });
 
     // Khusus kasir
