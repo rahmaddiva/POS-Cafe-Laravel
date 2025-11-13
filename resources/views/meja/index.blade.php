@@ -47,10 +47,10 @@
 
     <div class="p-6 lg:p-8 bg-white rounded-xl shadow-md my-10 max-w-7xl mx-auto">
         <div class="flex justify-between items-center mb-6">
-            <h2 class="text-3xl font-bold text-gray-800">Daftar Menu</h2>
-            <a href="{{ route('menu.create') }}"
+            <h2 class="text-3xl font-bold text-gray-800">Daftar Meja</h2>
+            <a href="{{ route('meja.create') }}"
                 class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                + Tambah Menu
+                + Tambah Meja
             </a>
         </div>
 
@@ -61,27 +61,21 @@
         @endif
 
         <div class="overflow-x-auto">
-            <table id="menu-table" class="min-w-full divide-y divide-gray-200">
+            <table id="meja-table" class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
                         <th scope="col"
                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No
                         </th>
                         <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama
-                            Menu</th>
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nomor
+                            Meja</th>
                         <th scope="col"
                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Kategori</th>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Harga
-                        </th>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stok
-                        </th>
+                            Kapasitas</th>
                         <th scope="col"
                             class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Gambar</th>
+                            Status</th>
                         <th scope="col"
                             class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Aksi
@@ -89,40 +83,35 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    @forelse ($menus as $menu)
+                    @forelse ($mejas as $meja)
                         <tr class="hover:bg-gray-50">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $loop->iteration }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {{ $menu->nama_menu }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $menu->kategori }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Rp
-                                {{ number_format($menu->harga, 0, ',', '.') }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $menu->stok }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex justify-center">
-                                @if ($menu->gambar)
-                                    <img src="{{ asset('storage/' . $menu->gambar) }}" alt="{{ $menu->nama_menu }}"
-                                        class="w-16 h-16 object-cover rounded-md shadow-sm">
-                                @else
-                                    <span class="text-gray-400">-</span>
-                                @endif
+                                {{ $meja->nomor_meja }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $meja->kapasitas }} orang
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
+                                <span
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $meja->status == 'kosong' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                    {{ ucfirst($meja->status) }}
+                                </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                                 <div class="flex items-center justify-center space-x-2">
-                                    <a href="{{ route('menu.edit', $menu->id) }}"
+                                    <a href="{{ route('meja.edit', $meja) }}"
                                         class="px-3 py-1 text-xs font-medium text-white bg-yellow-500 rounded-md hover:bg-yellow-600">Edit</a>
-                                    <form action="{{ route('menu.destroy', $menu->id) }}" method="POST"
-                                        class="inline">
+                                    <form action="{{ route('meja.destroy', $meja) }}" method="POST" class="inline">
                                         @csrf @method('DELETE')
                                         <button type="submit"
                                             class="px-3 py-1 text-xs font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
-                                            onclick="return confirm('Yakin hapus menu ini?')">Hapus</button>
+                                            onclick="return confirm('Yakin hapus meja ini?')">Hapus</button>
                                     </form>
                                 </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center py-10 text-gray-500">Belum ada data menu.</td>
+                            <td colspan="5" class="text-center py-10 text-gray-500">Belum ada data meja.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -132,8 +121,20 @@
 
     @push('scripts')
         <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
-        });
+        <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                $('#meja-table').DataTable({
+                    "language": {
+                        "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/id.json"
+                    },
+                    "columnDefs": [{
+                        "targets": [4], // index kolom 'Aksi'
+                        "orderable": false,
+                        "searchable": false
+                    }]
+                });
+            });
         </script>
     @endpush
-
 </x-app-layout>

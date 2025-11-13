@@ -14,7 +14,8 @@ class MenuController extends Controller
     public function index()
     {
         $menus = MenuModel::latest()->paginate(10);
-        return view('menu.index' , compact('menus'));
+
+        return view('menu.index', compact('menus'));
     }
 
     /**
@@ -35,25 +36,24 @@ class MenuController extends Controller
             'kategori' => 'required|in:Makanan,Minuman',
             'harga' => 'required|numeric',
             'stok' => 'required|integer|min:0',
-            'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+            'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $data = $request->only(['nama_menu', 'kategori', 'harga', 'stok']);
 
         if ($request->hasFile('gambar')) {
-            $data['gambar'] = $request->file('gambar')->store('menus' , 'public');
+            $data['gambar'] = $request->file('gambar')->store('menus', 'public');
         }
 
         MenuModel::create($data);
 
-        return redirect()->route('menu.index')->with('success' , 'Menu berhasil ditambahkan');
+        return redirect()->route('menu.index')->with('success', 'Menu berhasil ditambahkan');
     }
-
 
     /**
      * Display the specified resource.
      */
-    public function show(MenuModel $menuModel)
+    public function show(MenuModel $menu)
     {
         //
     }
@@ -61,17 +61,17 @@ class MenuController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(MenuModel $menuModel)
+    public function edit(MenuModel $menu)
     {
-        return view('menu.edit' , compact('menu'));
+        return view('menu.edit', compact('menu'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, MenuModel $menuModel)
+    public function update(Request $request, MenuModel $menu)
     {
-         $request->validate([
+        $request->validate([
             'nama_menu' => 'required|string|max:255',
             'kategori' => 'required|in:Makanan,Minuman',
             'harga' => 'required|numeric',
@@ -98,9 +98,9 @@ class MenuController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(MenuModel $menuModel)
+    public function destroy(MenuModel $menu)
     {
-     if ($menu->gambar && Storage::disk('public')->exists($menu->gambar)) {
+        if ($menu->gambar && Storage::disk('public')->exists($menu->gambar)) {
             Storage::disk('public')->delete($menu->gambar);
         }
 

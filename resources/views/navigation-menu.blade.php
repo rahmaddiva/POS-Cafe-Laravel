@@ -18,10 +18,18 @@
                 </div>
 
                 @if (auth()->user()->role === 'admin')
-                    <x-nav-link :href="route('menu.index')" :active="request()->routeIs('menu.*')">
-                        {{ __('Menu') }}
-                    </x-nav-link>
+                    <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                        <x-nav-link :href="route('menu.index')" :active="request()->routeIs('menu.*')">
+                            {{ __('Menu') }}
+                        </x-nav-link>
+                    </div>
                 @endif
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('meja.index')" :active="request()->routeIs('meja.*')">
+                        {{ __('Meja') }}
+                    </x-nav-link>
+                </div>
+
 
 
             </div>
@@ -160,6 +168,19 @@
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
+            </x-responsive-nav-link>
+        </div>
+        @if (auth()->user()->role === 'admin')
+            <div class="pt-2 pb-3 space-y-1">
+                <x-responsive-nav-link href="{{ route('menu.index') }}" :active="request()->routeIs('menu.*')">
+                    {{ __('Menu') }}
+                </x-responsive-nav-link>
+            </div>
+        @endif
+
+        <div class="pt-2 pb-3 space-y-1">
+            <x-responsive-nav-link href="{{ route('meja.index') }}" :active="request()->routeIs('meja.*')">
+                {{ __('Meja') }}
             </x-responsive-nav-link>
         </div>
 
